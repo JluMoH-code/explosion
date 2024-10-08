@@ -1,11 +1,11 @@
 class ReferencePoint:
-    def __init__(self, image_coords, global_coords):
+    def __init__(self, local_coords = None, global_coords = None):
         """
-        image_coords: Координаты точки на изображении (локальные)
+        local_coords: Координаты точки на изображении (локальные)
         global_coords: Глобальные координаты этой точки на поле
         """
-        self.image_coords = image_coords
+        self.local_coords = local_coords
         self.global_coords = global_coords
         
     def __repr__(self):
-        return f"ReferencePoint (image_coords={self.image_coords}, global_coords={self.global_coords})"
+        return f"ReferencePoint (local_coords={self.local_coords}, global_coords={self.global_coords})"
