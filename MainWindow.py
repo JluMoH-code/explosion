@@ -124,23 +124,9 @@ class MainWindow(QMainWindow):
         """
         Отображение изображения в QLabel с уменьшением до 1280x720, если изображение больше.
         """
-        max_width = 1280
-        max_height = 720
-
-        # Получаем размеры изображения
         original_height, original_width, _ = image.shape
-
-        # Пропорциональное масштабирование
-        if original_width > max_width or original_height > max_height:
-            # Рассчитываем коэффициент масштабирования
-            self.scale_factor = min(max_width / original_width, max_height / original_height)
-            new_width = int(original_width * self.scale_factor)
-            new_height = int(original_height * self.scale_factor)
-        else:
-            # Если изображение меньше или равно, сохраняем его размеры и масштабирование 1:1
-            new_width, new_height = original_width, original_height
-            self.scale_factor = 1.0
-
+        self.scale_factor, new_width, new_height = DisplayUtils.calculate_scale_factor(original_height, original_width, max_width=1280, max_height=720)
+        
         # Преобразуем изображение OpenCV в формат QImage
         bytes_per_line = 3 * original_width
         q_img = QImage(image.data, original_width, original_height, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
