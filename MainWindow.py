@@ -160,10 +160,11 @@ class MainWindow(QMainWindow):
                 self.ref_points_manager.select_point(self.image)
             elif method == "Template Matching":
                 
-                template = DisplayUtils.open_template_input_window(image)
+                template = DisplayUtils.open_template_input_window(self.image)
                 if template:
-                    self.ref_points_manager.set_selector(TemplateMatchingSelector)
-                    self.ref_points_manager.select_points(self.image, template)       
+                    self.display_image(template)
+                    # self.ref_points_manager.set_selector(TemplateMatchingSelector)
+                    # self.ref_points_manager.select_points(self.image, template)       
                 
     def mouse_click(self, event):
         """

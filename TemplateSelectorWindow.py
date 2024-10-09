@@ -101,7 +101,7 @@ class TemplateWindow(QDialog):
         # Кнопка для выбора другого шаблона
         self.change_template_btn = QPushButton("Выбрать другой", self)
         self.bottom_layout.addWidget(self.change_template_btn, alignment=Qt.AlignCenter)
-        self.change_template_btn.clicked.connect(self.change_template_btn)
+        self.change_template_btn.clicked.connect(self.change_template)
 
         self.main_layout.addWidget(self.image_label)
         self.main_layout.addLayout(self.bottom_layout)
@@ -115,6 +115,6 @@ class TemplateWindow(QDialog):
         self.accept_template = True
         super().accept()        
     
-    def change_template_btn(self):
+    def change_template(self):
         self.accept_template = False
         super().accept()  
