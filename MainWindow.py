@@ -112,7 +112,6 @@ class MainWindow(QMainWindow):
             return
         
         display_image = self.image.copy()
-        print(self.points)
 
         for point in self.points:
             x, y = point.local_coords
