@@ -73,6 +73,21 @@ class MainWindow(QMainWindow):
         main_layout.addWidget(self.image_label, 2)
         main_layout.addLayout(self.right_layout, 1)
 
+    def keyPressEvent(self, event):
+        """
+        Обработка нажатий клавиш.
+        """
+        if event.key() == Qt.Key_O and event.modifiers() == Qt.ControlModifier:
+            self.load_image()
+        elif event.key() == Qt.Key_E:
+            self.select_points()
+        elif event.key() == Qt.Key_T:
+            self.select_target_point()
+        elif event.key() == Qt.Key_Q:
+            self.end_select_points()
+        else:
+            super().keyPressEvent(event)
+
     def update_points_count(self):
         """
         Обновляет текст в QLabel с количеством введённых точек.
@@ -171,7 +186,7 @@ class MainWindow(QMainWindow):
                 
                 # Добавить окошко выбора шаблона
                 
-                self.ref_points_manager.select_point(self.image, template)
+                self.ref_points_manager.select_points(self.image, template)
                 
     def mouse_click(self, event):
         """
