@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from ReferencePoint import ReferencePoint
+from Point import Point
 from DisplayUtils import DisplayUtils
         
 class ReferencePointsSelector:
@@ -74,7 +74,7 @@ class TemplateMatchingSelector(ReferencePointsSelector):
         for pt in zip(*loc[::-1]):
             x, y = pt
             global_coords = self.ask_for_global_coords()
-            point = ReferencePoint((x, y), global_coords)
+            point = Point((x, y), global_coords)
             self.points.append(point)
             print(f"Автоматически (по шаблону) добавлена точка: {point}")
 
