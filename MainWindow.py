@@ -156,6 +156,59 @@ class MainWindow(QMainWindow):
         if point:
             self.points.append(point)
             self.draw_points()
+            self.update_points_count()
+                
+    def select_target_point(self):
+        """
+        Логика для выбора искомой точки.
+        """
+        self.image_label.mousePressEvent = self.mouse_click_target_point
+            
+    def mouse_click_target_point(self, event):
+        """
+        Обработка клика на изображении для выбора искомой точки.
+        Открывает окно для с локальными и глобальными координатами.
+        """
+        
+        if self.image is None:
+            return
+        
+        x_scaled = event.pos().x()
+        y_scaled = event.pos().y()
+
+        # Пересчитываем координаты обратно на оригинальные
+        x_original = int(x_scaled / self.scale_factor)
+        y_original = int(y_scaled / self.scale_factor)
+        
+        target_point = Point(local_coords=(x_original, y_original)) 
+        
+        try:     
+            target_point = CoordinateConverter.convert_to_global(self.points, target_point)  
+            # Открываем окно для отображение координат
+            point = DisplayUtils.open_coords_input_window(target_point)
+        except ValueError as e:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText(str(e))
+            msg.setWindowTitle("Ошибка")
+            
+            high_precision_btn = msg.addButton("Всё равно считать", QMessageBox.ActionRole)
+            adding_points_btn = msg.addButton("Добавить точки", QMessageBox.ActionRole)
+
+            msg.exec_() 
+            if msg.clickedButton() == high_precision_btn:
+                try:
+                    target_point = CoordinateConverter.simple_linear_transformation(self.points, target_point)  
+                    # Открываем окно для отображение координат
+                    point = DisplayUtils.open_coords_input_window(target_point)
+                except ValueError as e:
+                    msg = QMessageBox()
+                    msg.setIcon(QMessageBox.Critical)
+                    msg.setText(str(e))
+                    msg.setWindowTitle("Ошибка")
+                    msg.exec_()   
+            elif msg.clickedButton() == adding_points_btn:
+                self.select_points()
             
     @staticmethod
     def run():
