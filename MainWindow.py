@@ -129,6 +129,17 @@ class MainWindow(QMainWindow):
         # Отображаем изображение в QLabel
         self.image_label.setPixmap(scaled_pixmap)
 
+    def end_select_points(self):
+        """
+        Логика для завершения выбора точек.
+        """
+        self.image_label.mousePressEvent = None
+        
+        if hasattr(self, 'finish_select_btn'):
+            self.right_layout.removeWidget(self.finish_select_btn)
+            self.finish_select_btn.deleteLater()  # Удаляем кнопку из интерфейса
+            del self.finish_select_btn  # Удаляем атрибут из класса
+
     def select_points(self):
         """
         Логика для выбора точек.
@@ -138,7 +149,22 @@ class MainWindow(QMainWindow):
         if self.image is not None:
             if method == "Manual":
                 self.image_label.mousePressEvent = self.mouse_click
-            
+                
+                # Создаём кнопку "Завершить выбор точек" (если она еще не была создана)
+                if not hasattr(self, 'finish_select_btn'):
+                    self.finish_select_btn = QPushButton("Завершить выбор точек", self)
+                    self.finish_select_btn.clicked.connect(self.end_select_points)
+                    self.right_layout.addWidget(self.finish_select_btn, alignment=Qt.AlignCenter)              
+            elif method == "Auto":
+                self.ref_points_manager.set_selector(AutoPointsSelector)
+                self.ref_points_manager.select_point(self.image)
+            elif method == "Template Matching":
+                self.ref_points_manager.set_selector(TemplateMatchingSelector)
+                
+                # Добавить окошко выбора шаблона
+                
+                self.ref_points_manager.select_point(self.image, template)
+                
     def mouse_click(self, event):
         """
         Обработка клика на изображении для выбора точки.
@@ -152,7 +178,9 @@ class MainWindow(QMainWindow):
         y_original = int(y_scaled / self.scale_factor)
 
         # Открываем окно для ввода глобальных координат (локальные координаты передаются)
-        point = DisplayUtils.open_coords_input_window(local_coords=(x_original, y_original))
+        point = Point(local_coords=(x_original, y_original))
+        point = DisplayUtils.open_coords_input_window(point)
+        
         if point:
             self.points.append(point)
             self.draw_points()
