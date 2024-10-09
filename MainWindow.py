@@ -1,9 +1,13 @@
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel, QPushButton, 
-                             QComboBox, QVBoxLayout, QHBoxLayout, QWidget)
+                             QComboBox, QVBoxLayout, QHBoxLayout, QWidget, QMessageBox)
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtCore import Qt
 import cv2
 from DisplayUtils import DisplayUtils
+from ReferencePointsManager import ReferencePointsManager
+from ReferencePointsSelector import AutoPointsSelector, TemplateMatchingSelector
+from CoordinateConverter import CoordinateConverter
+from Point import Point
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -11,6 +15,9 @@ class MainWindow(QMainWindow):
         self.points = []
         self.image = None
         self.scale_factor = 1
+        self.ref_points_manager = ReferencePointsManager()
+        self.converter = CoordinateConverter()
+        self.target_point = None
         
         self.setWindowTitle("Выбор реперных точек")
 
