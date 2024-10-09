@@ -27,34 +27,50 @@ class MainWindow(QMainWindow):
         self.image_label.setAlignment(Qt.AlignCenter)
 
         # Правая часть - элементы управления
-        right_layout = QVBoxLayout()
-        right_layout.addStretch()
+        self.right_layout = QVBoxLayout()
+        self.right_layout.addStretch()
 
         # Кнопка для загрузки изображения
         self.load_image_btn = QPushButton("Загрузить изображение", self)
         self.load_image_btn.clicked.connect(self.load_image)
-        right_layout.addWidget(self.load_image_btn, alignment=Qt.AlignCenter)
+        self.right_layout.addWidget(self.load_image_btn, alignment=Qt.AlignCenter)
         
         # Подпись для комбобокса
         self.method_label = QLabel("Метод выделения точек:", self)
         self.method_label.setAlignment(Qt.AlignCenter)
-        right_layout.addWidget(self.method_label, alignment=Qt.AlignCenter)
+        self.right_layout.addWidget(self.method_label, alignment=Qt.AlignCenter)
 
         # Выпадающий список для выбора метода
         self.method_selector = QComboBox(self)
         self.method_selector.addItems(["Manual", "Template Matching"])
-        right_layout.addWidget(self.method_selector, alignment=Qt.AlignCenter)
+        self.right_layout.addWidget(self.method_selector, alignment=Qt.AlignCenter)
 
         # Кнопка для выбора точки
-        self.select_point_btn = QPushButton("Выбрать точки", self)
+        self.select_point_btn = QPushButton("Выбрать опорные точки", self)
         self.select_point_btn.clicked.connect(self.select_points)
-        right_layout.addWidget(self.select_point_btn, alignment=Qt.AlignCenter)
+        self.right_layout.addWidget(self.select_point_btn, alignment=Qt.AlignCenter)
         
-        right_layout.addStretch()
+        self.points_count_label = QLabel(self)
+        self.points_count_label.setText("Введено опорных точек: 0")
+        self.right_layout.addWidget(self.points_count_label)
+        
+        # Кнопка для выбора искомой точки
+        self.select_target_point_btn = QPushButton("Выбрать искомую точку", self)
+        self.select_target_point_btn.clicked.connect(self.select_target_point)
+        self.right_layout.addWidget(self.select_target_point_btn, alignment=Qt.AlignCenter)
+        
+        self.right_layout.addStretch()
 
         # Добавляем элементы в основной layout
         main_layout.addWidget(self.image_label, 2)
-        main_layout.addLayout(right_layout, 1)
+        main_layout.addLayout(self.right_layout, 1)
+
+    def update_points_count(self):
+        """
+        Обновляет текст в QLabel с количеством введённых точек.
+        """
+        points_count = len(self.points)
+        self.points_count_label.setText(f"Введено опорных точек: {points_count}")
 
     def load_image(self):
         """
