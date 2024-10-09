@@ -1,4 +1,4 @@
-class ReferencePoint:
+class Point:
     def __init__(self, local_coords = None, global_coords = None):
         """
         local_coords: Координаты точки на изображении (локальные)
@@ -8,4 +8,4 @@ class ReferencePoint:
         self.global_coords = global_coords
         
     def __repr__(self):
-        return f"ReferencePoint (local_coords={self.local_coords}, global_coords={self.global_coords})"
+        return f"Point (local_coords={self.local_coords}, global_coords={self.global_coords})"
