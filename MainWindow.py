@@ -101,7 +101,8 @@ class MainWindow(QMainWindow):
         """
         file_name = DisplayUtils.open_image_file()
         if file_name:
-            self.image = cv2.imread(file_name)
+            image = cv2.imread(file_name)
+            self.image = DisplayUtils.from_cv_to_qimg(image)
             self.display_image(self.image)
 
     def draw_points(self):
@@ -123,18 +124,7 @@ class MainWindow(QMainWindow):
         """
         Отображение изображения в QLabel с уменьшением до 1280x720, если изображение больше.
         """
-        original_height, original_width, _ = image.shape
-        self.scale_factor, new_width, new_height = DisplayUtils.calculate_scale_factor(original_height, original_width, max_width=1280, max_height=720)
-        
-        # Преобразуем изображение OpenCV в формат QImage
-        bytes_per_line = 3 * original_width
-        q_img = QImage(image.data, original_width, original_height, bytes_per_line, QImage.Format_RGB888).rgbSwapped()
-
-        # Создаём QPixmap и масштабируем его до новых размеров
-        pixmap = QPixmap.fromImage(q_img)
-        scaled_pixmap = pixmap.scaled(new_width, new_height, Qt.KeepAspectRatio)
-
-        # Отображаем изображение в QLabel
+        scaled_pixmap, self.scale_factor = DisplayUtils.get_scaled_pixmap(image, max_width=1280, max_height=720)
         self.image_label.setPixmap(scaled_pixmap)
 
     def end_select_points(self):
