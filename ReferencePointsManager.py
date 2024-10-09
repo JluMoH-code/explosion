@@ -1,7 +1,7 @@
 from ReferencePointsSelector import *
 
 class ReferencePointsManager:
-    def __init__(self, selector: ReferencePointsSelector):
+    def __init__(self, selector: ReferencePointsSelector = None):
         self.selector = selector
 
     def set_selector(self, selector: ReferencePointsSelector):
@@ -10,11 +10,11 @@ class ReferencePointsManager:
         """
         self.selector = selector
 
-    def select_points(self, image):
+    def select_points(self, image, template = None):
         """
         Выполняем выбор точек через установленный селектор.
         """
-        self.selector.select_points(image)
+        self.selector.select_points(image, template)
 
     def get_points(self):
         """
