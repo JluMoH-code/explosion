@@ -1,5 +1,4 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel
-from ReferencePoint import ReferencePoint
 
 class CoordInputWindow(QDialog):
     def __init__(self, point):
