@@ -15,6 +15,7 @@ class MainWindow(QMainWindow):
         self.points = []
         self.image = None
         self.scale_factor = 1
+        self.selection_radius = 10
         self.ref_points_manager = ReferencePointsManager()
         self.converter = CoordinateConverter()
         self.target_point = None
@@ -183,6 +184,21 @@ class MainWindow(QMainWindow):
         # Пересчитываем координаты обратно на оригинальные
         x_original = int(x_scaled / self.scale_factor)
         y_original = int(y_scaled / self.scale_factor)
+        
+        # Проверка, находится ли клик в пределах существующих точек
+        nearest_point = self.find_nearest_point(x_original, y_original)
+        if nearest_point:
+            updated_point = DisplayUtils.open_coords_input_window(nearest_point, update=True)
+            if updated_point:
+                index = self.points.index(nearest_point)
+                self.points[index] = updated_point
+                self.draw_points()
+                self.update_points_count()
+            else:
+                self.points.remove(nearest_point)  
+                self.draw_points() 
+                self.update_points_count()
+            return
 
         # Открываем окно для ввода глобальных координат (локальные координаты передаются)
         point = Point(local_coords=(x_original, y_original))
@@ -192,6 +208,17 @@ class MainWindow(QMainWindow):
             self.points.append(point)
             self.draw_points()
             self.update_points_count()
+         
+    def find_nearest_point(self, x, y):
+        """
+        Находит ближайшую точку к заданным координатам в пределах радиуса.
+        """
+        for point in self.points:
+            px, py = point.local_coords
+            # Проверка расстояния
+            if ((px - x) ** 2 + (py - y) ** 2) <= ((self.selection_radius / self.scale_factor) ** 2):
+                return point
+        return None
                 
     def select_target_point(self):
         """

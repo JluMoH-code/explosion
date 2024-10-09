@@ -1,10 +1,11 @@
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QPushButton, QLabel
 
 class CoordInputWindow(QDialog):
-    def __init__(self, point):
+    def __init__(self, point, update):
         super().__init__()
         self.setWindowTitle("Координаты точки")
         self.point = point
+        self.update = update
 
         self.local_input = QLabel("Локальные координаты", self)
 
@@ -36,18 +37,28 @@ class CoordInputWindow(QDialog):
         layout.addWidget(self.global_input)
         layout.addWidget(self.coord_x_input)
         layout.addWidget(self.coord_y_input)
-
-        if point.global_coords is not None:
+        
+        if update:
             self.coord_x_input.setText(str(self.point.global_coords[0]))
-            self.coord_x_input.setDisabled(True)  # Заблокировано для изменения
             self.coord_y_input.setText(str(self.point.global_coords[1]))
+            self.update_point_btn = QPushButton("Обновить точку", self)
+            self.delete_point_btn = QPushButton("Удалить точку", self)
+            self.update_point_btn.clicked.connect(self.accept_coords)
+            self.delete_point_btn.clicked.connect(self.reject_with_delete)
+            layout.addWidget(self.update_point_btn)
+            layout.addWidget(self.delete_point_btn)
+
+        elif point.global_coords is not None:
+            self.coord_x_input.setText(str(self.point.global_coords[0]))
+            self.coord_y_input.setText(str(self.point.global_coords[1]))
+            self.coord_x_input.setDisabled(True)  # Заблокировано для изменения
             self.coord_y_input.setDisabled(True)  # Заблокировано для изменения
         else:
             # Кнопки для добавления и удаления точек
             self.add_point_btn = QPushButton("Добавить точку", self)
             self.delete_point_btn = QPushButton("Удалить точку", self)
             self.add_point_btn.clicked.connect(self.accept_coords)
-            self.delete_point_btn.clicked.connect(self.reject)
+            self.delete_point_btn.clicked.connect(self.reject_with_delete)
             layout.addWidget(self.add_point_btn)
             layout.addWidget(self.delete_point_btn)
             
@@ -90,6 +101,10 @@ class CoordInputWindow(QDialog):
         if not has_errors:
             self.point.global_coords = (x, y)
             self.accept()
+
+    def reject_with_delete(self):
+        self.point = None
+        super().reject()
 
     def reset_color(self, input_field):
         """

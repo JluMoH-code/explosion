@@ -19,13 +19,13 @@ class DisplayUtils:
         msg.exec_()
 
     @staticmethod
-    def open_coords_input_window(point):
+    def open_coords_input_window(point, update=False):
         """
         Открыть новое окно для ввода глобальных координат.
         """
         from CoordInputWindow import CoordInputWindow
-        window = CoordInputWindow(point)
+        
+        window = CoordInputWindow(point, update)
         window.exec_()
-        if window.get_point().global_coords is not None:
-            return window.get_point()
-        else: return False 
+        
+        return window.get_point() if window.get_point() is not None else False
