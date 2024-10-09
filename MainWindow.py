@@ -1,7 +1,9 @@
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel, QPushButton, 
-                             QComboBox, QVBoxLayout, QHBoxLayout, QWidget, QMessageBox)
+                             QComboBox, QVBoxLayout, QHBoxLayout, QWidget, 
+                             QMessageBox, QGraphicsView, QGraphicsScene, QGraphicsRectItem,
+                             QRubberBand)
 from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QPoint, QRect, QSize
 import cv2
 from DisplayUtils import DisplayUtils
 from ReferencePointsManager import ReferencePointsManager
@@ -27,7 +29,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
         # Основной layout для всего окна
-        main_layout = QHBoxLayout(central_widget)
+        self.main_layout = QHBoxLayout(central_widget)
 
         # Левая часть - отображение изображения
         self.image_label = QLabel(self)
@@ -70,8 +72,8 @@ class MainWindow(QMainWindow):
         self.right_layout.addStretch()
 
         # Добавляем элементы в основной layout
-        main_layout.addWidget(self.image_label, 2)
-        main_layout.addLayout(self.right_layout, 1)
+        self.main_layout.addWidget(self.image_label, 2)
+        self.main_layout.addLayout(self.right_layout, 1)
 
     def keyPressEvent(self, event):
         """
@@ -157,11 +159,17 @@ class MainWindow(QMainWindow):
                 self.ref_points_manager.set_selector(AutoPointsSelector)
                 self.ref_points_manager.select_point(self.image)
             elif method == "Template Matching":
+                template = self.select_template_area(self.image)
                 self.ref_points_manager.set_selector(TemplateMatchingSelector)
-                
                 # Добавить окошко выбора шаблона
                 
-                self.ref_points_manager.select_points(self.image, template)
+                # self.ref_points_manager.select_points(self.image, template)
+                
+    def select_template_area(self, image):
+        """
+        Метод для выбора области изображения, которая будет использоваться в качестве шаблона.
+        """
+        DisplayUtils.open_template_input_window(image)        
                 
     def mouse_click(self, event):
         """

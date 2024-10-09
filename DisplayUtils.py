@@ -1,4 +1,7 @@
 from PyQt5.QtWidgets import QFileDialog, QMessageBox
+from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtCore import Qt
+import cv2
 
 class DisplayUtils:
     @staticmethod
@@ -55,6 +58,18 @@ class DisplayUtils:
         window.exec_()
         
         return window.get_point() if window.get_point() is not None else False
+    
+    @staticmethod
+    def open_template_input_window(image):
+        """
+        Открыть новое окно для выбора шаблона.
+        """
+        from TemplateSelectorWindow import TemplateSelectorWindow
+        
+        window = TemplateSelectorWindow(image)
+        window.exec_()
+        
+        # return window.get_point() if window.get_point() is not None else False
     
     @staticmethod
     def calculate_scale_factor(original_height, original_width, max_width=1280, max_height=720):
