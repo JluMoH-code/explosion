@@ -11,6 +11,7 @@ class TemplateSelectorWindow(QDialog):
     def __init__(self, image):
         super().__init__()
         self.image = image
+        self.template = None
         """
         Используется магическая QRubberBand
         """                
@@ -48,10 +49,18 @@ class TemplateSelectorWindow(QDialog):
             self.rubberBand.hide()
             rect = self.rubberBand.geometry()
             
-            cropped_image = self.crop_image(rect)
+            self.template = self.crop_image(rect)
             
-            widget = TemplateWindow(cropped_image)
-            widget.exec_()
+            template_window = TemplateWindow(self.template)
+            template_window.exec_()
+            
+            if template_window.accept_template:
+                super().accept()
+            else:
+                self.template = None
+                
+    def get_template(self):
+        return self.template
             
     def crop_image(self, rect):
         """
@@ -64,8 +73,8 @@ class TemplateSelectorWindow(QDialog):
         y2 = int((rect.y() + rect.height()) / self.scale_factor)
 
         # Обрезаем исходное изображение
-        cropped_image = self.image.copy(x1, y1, x2 - x1, y2 - y1)
-        return cropped_image   
+        template = self.image.copy(x1, y1, x2 - x1, y2 - y1)
+        return template  
             
 class TemplateWindow(QDialog):
     """
@@ -74,6 +83,7 @@ class TemplateWindow(QDialog):
     def __init__(self, image):
         super().__init__()
         self.image = image
+        self.accept_template = False
         
         # Основной layout для всего окна
         self.main_layout = QVBoxLayout()
@@ -86,10 +96,12 @@ class TemplateWindow(QDialog):
         # Кнопка для подтверждения шаблона
         self.access_btn = QPushButton("Подтвердить", self)
         self.bottom_layout.addWidget(self.access_btn, alignment=Qt.AlignCenter)
+        self.access_btn.clicked.connect(self.accept)
         
         # Кнопка для выбора другого шаблона
         self.change_template_btn = QPushButton("Выбрать другой", self)
         self.bottom_layout.addWidget(self.change_template_btn, alignment=Qt.AlignCenter)
+        self.change_template_btn.clicked.connect(self.change_template_btn)
 
         self.main_layout.addWidget(self.image_label)
         self.main_layout.addLayout(self.bottom_layout)
@@ -98,3 +110,11 @@ class TemplateWindow(QDialog):
 
         # Настройка окна
         self.setWindowTitle('Подтверждение шаблона')
+        
+    def accept(self):
+        self.accept_template = True
+        super().accept()        
+    
+    def change_template_btn(self):
+        self.accept_template = False
+        super().accept()  

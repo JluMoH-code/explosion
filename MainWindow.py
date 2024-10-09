@@ -159,17 +159,11 @@ class MainWindow(QMainWindow):
                 self.ref_points_manager.set_selector(AutoPointsSelector)
                 self.ref_points_manager.select_point(self.image)
             elif method == "Template Matching":
-                template = self.select_template_area(self.image)
-                self.ref_points_manager.set_selector(TemplateMatchingSelector)
-                # Добавить окошко выбора шаблона
                 
-                # self.ref_points_manager.select_points(self.image, template)
-                
-    def select_template_area(self, image):
-        """
-        Метод для выбора области изображения, которая будет использоваться в качестве шаблона.
-        """
-        DisplayUtils.open_template_input_window(image)        
+                template = DisplayUtils.open_template_input_window(image)
+                if template:
+                    self.ref_points_manager.set_selector(TemplateMatchingSelector)
+                    self.ref_points_manager.select_points(self.image, template)       
                 
     def mouse_click(self, event):
         """

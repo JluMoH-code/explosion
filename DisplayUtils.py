@@ -69,7 +69,7 @@ class DisplayUtils:
         window = TemplateSelectorWindow(image)
         window.exec_()
         
-        # return window.get_point() if window.get_point() is not None else False
+        return window.get_template() if window.get_template() is not None else False
     
     @staticmethod
     def calculate_scale_factor(original_height, original_width, max_width=1280, max_height=720):
