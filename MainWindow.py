@@ -1,9 +1,7 @@
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel, QPushButton, 
                              QComboBox, QVBoxLayout, QHBoxLayout, QWidget, 
-                             QMessageBox, QGraphicsView, QGraphicsScene, QGraphicsRectItem,
-                             QRubberBand)
-from PyQt5.QtGui import QPixmap, QImage
-from PyQt5.QtCore import Qt, QPoint, QRect, QSize
+                             QMessageBox)
+from PyQt5.QtCore import Qt
 import cv2
 from DisplayUtils import DisplayUtils
 from ReferencePointsManager import ReferencePointsManager
