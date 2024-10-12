@@ -1,8 +1,6 @@
 from PyQt5.QtCore import Qt, QPoint, QRect, QSize
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QApplication, QLabel, QRubberBand, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QDialog
+from PyQt5.QtWidgets import QLabel, QRubberBand, QVBoxLayout, QHBoxLayout, QPushButton, QDialog
 from DisplayUtils import DisplayUtils
-import cv2
 
 class TemplateSelectorWindow(QDialog):
     """
@@ -17,6 +15,7 @@ class TemplateSelectorWindow(QDialog):
         """                
         self.rubberBand = None
         self.origin = QPoint()
+        self.rectang = None
 
         self.image_label = QLabel(self)
         scaled_pixmap, self.scale_factor = DisplayUtils.get_scaled_pixmap(self.image, 1280, 720)
