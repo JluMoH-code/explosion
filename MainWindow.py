@@ -113,16 +113,17 @@ class MainWindow(QMainWindow):
         """
         Метод для отображения всех реперных точек на изображении.
         """
-        if self.image is None:
+        if self.image_cv is None:
             return
         
-        display_image = self.image.copy()
+        display_image = self.image_cv.copy()
+        radius = int(5 / self.scale_factor)
 
         for point in self.points:
-            x, y = point.local_coords
-            cv2.circle(display_image, (x, y), radius=int(5 / self.scale_factor), color=(0, 0, 255), thickness=-1)  # Красная точка
+            display_image = DisplayUtils.draw_point(display_image, point, radius)
 
-        self.display_image(display_image)  # Обновляем QLabel
+        display_image = DisplayUtils.from_cv_to_qimg(display_image)
+        self.display_image(display_image)
 
     def display_image(self, image):
         """

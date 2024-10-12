@@ -4,6 +4,10 @@ from PyQt5.QtCore import Qt
 import cv2
 
 class DisplayUtils:
+
+    GREEN = (0, 255, 0)
+    RED = (0, 0, 255)
+
     @staticmethod
     def open_image_file():
         """
@@ -33,6 +37,14 @@ class DisplayUtils:
         # Преобразуем изображение OpenCV в формат QImage
         bytes_per_line = 3 * original_width
         return QImage(image_rgb.data, original_width, original_height, bytes_per_line, QImage.Format_RGB888)
+
+    @staticmethod
+    def draw_point(image, point, radius):
+        if point.has_global(): color = DisplayUtils.GREEN
+        else: color = DisplayUtils.RED
+
+        image = cv2.circle(image, point.local_coords, radius, color, thickness=-1)
+        return image
 
     @staticmethod
     def get_scaled_pixmap(image, max_width=1280, max_height=720):

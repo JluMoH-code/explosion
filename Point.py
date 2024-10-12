@@ -9,3 +9,7 @@ class Point:
         
     def __repr__(self):
         return f"Point (local_coords={self.local_coords}, global_coords={self.global_coords})"
+    
+    def has_global(self):
+        if self.global_coords is not None: return True
+        return False
