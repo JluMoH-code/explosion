@@ -59,7 +59,10 @@ class TemplateSelectorWindow(QDialog):
                 self.template = None
                 
     def get_template(self):
-        return self.template if self.template is not None else False 
+        if self.template is None:
+            return False
+        
+        return DisplayUtils.from_qimg_to_cv(self.template) 
             
     def crop_image(self, rect):
         """

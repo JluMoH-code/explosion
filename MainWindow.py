@@ -124,6 +124,7 @@ class MainWindow(QMainWindow):
 
         display_image = DisplayUtils.from_cv_to_qimg(display_image)
         self.display_image(display_image)
+        self.update_points_count()
 
     def display_image(self, image):
         """
@@ -164,10 +165,15 @@ class MainWindow(QMainWindow):
             elif method == "Template Matching":
                 
                 template = DisplayUtils.open_template_input_window(self.image)
-                if template:
-                    self.display_image(template)
-                    # self.ref_points_manager.set_selector(TemplateMatchingSelector)
-                    # self.ref_points_manager.select_points(self.image, template)       
+                if template is not False:
+                    # self.display_image(template)
+                    self.ref_points_manager.set_selector(TemplateMatchingSelector())
+                    template_points = self.ref_points_manager.select_points(self.image_cv, template, self.scale_factor)
+                    print(template_points)
+                    if template_points is not None:
+                        self.points += template_points
+                        print(self.points)
+                        self.draw_points()       
                 
     def mouse_click(self, event):
         """

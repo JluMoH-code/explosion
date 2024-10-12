@@ -15,7 +15,7 @@ class ReferencePointsSelector:
         y = float(input("Enter global coords Y: "))
         return (x, y)
         
-    def select_points(self):
+    def select_points(self, image, template=None, scale_factor=1):
         """
         Определяет логику выбора точек на изображении.
         """
@@ -59,23 +59,20 @@ class AutoPointsSelector(ReferencePointsSelector):
         pass
 
 class TemplateMatchingSelector(ReferencePointsSelector):
-    def __init__(self, template):
+    def __init__(self):
         super().__init__()
-        self.template = template
     
-    def select_points(self, image):
+    def select_points(self, image, template, scale_factor=1):
         """
         Метод для нахождения точек с использованием шаблонного распознавания.
         """
-        result = cv2.matchTemplate(image, self.template, cv2.TM_CCOEFF_NORMED)
+        result = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
         threshold = 0.8
         loc = np.where(result >= threshold)
 
         for pt in zip(*loc[::-1]):
-            x, y = pt
-            global_coords = self.ask_for_global_coords()
-            point = Point((x, y), global_coords)
+            point = Point(pt)
             self.points.append(point)
             print(f"Автоматически (по шаблону) добавлена точка: {point}")
 
-        return image
+        return self.points

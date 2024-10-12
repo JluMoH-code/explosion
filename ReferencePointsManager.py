@@ -10,11 +10,11 @@ class ReferencePointsManager:
         """
         self.selector = selector
 
-    def select_points(self, image, template = None):
+    def select_points(self, image, template=None, scale_factor=1):
         """
         Выполняем выбор точек через установленный селектор.
         """
-        self.selector.select_points(image, template)
+        return self.selector.select_points(image, template, scale_factor)
 
     def get_points(self):
         """
