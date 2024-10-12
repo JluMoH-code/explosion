@@ -13,6 +13,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.points = []
+        self.image_cv = None
         self.image = None
         self.scale_factor = 1
         self.selection_radius = 10
@@ -99,11 +100,14 @@ class MainWindow(QMainWindow):
         """
         Загрузка изображения через QFileDialog.
         """
-        file_name = DisplayUtils.open_image_file()
-        if file_name:
-            image = cv2.imread(file_name)
-            self.image = DisplayUtils.from_cv_to_qimg(image)
-            self.display_image(self.image)
+        try:
+            file_name = DisplayUtils.open_image_file()
+            if file_name:
+                self.image_cv = cv2.imread(file_name)
+                self.image = DisplayUtils.from_cv_to_qimg(self.image_cv)
+                self.display_image(self.image)
+        except Exception as e:
+            DisplayUtils.show_message(str(e))
 
     def draw_points(self):
         """

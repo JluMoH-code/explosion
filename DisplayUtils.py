@@ -10,7 +10,11 @@ class DisplayUtils:
         Открыть диалоговое окно для выбора файла изображения или видео.
         """
         file_name, _ = QFileDialog.getOpenFileName(None, "Выберите изображение", "", "Images (*.png *.jpg *.bmp *.jpeg);;Videos (*.mp4 *.avi *.mkv)")
-        return file_name
+        if not file_name:
+            return False
+        if not cv2.haveImageReader(file_name):
+            raise Exception('Ошибка чтения файла')
+        return file_name        
 
     @staticmethod
     def show_message(message):
