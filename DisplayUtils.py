@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from PyQt5.QtGui import QPixmap, QImage
 from PyQt5.QtCore import Qt
 import cv2
+import numpy as np
 
 class DisplayUtils:
 
@@ -37,6 +38,19 @@ class DisplayUtils:
         # Преобразуем изображение OpenCV в формат QImage
         bytes_per_line = 3 * original_width
         return QImage(image_rgb.data, original_width, original_height, bytes_per_line, QImage.Format_RGB888)
+
+    @staticmethod
+    def from_qimg_to_cv(image):
+        qimage = image.convertToFormat(QImage.Format.Format_RGB888)
+        width = qimage.width()
+        height = qimage.height()
+
+        ptr = qimage.bits()
+        ptr.setsize(height * width * 3)  
+        arr = np.array(ptr).reshape(height, width, 3)  
+
+        image = cv2.cvtColor(arr, cv2.COLOR_RGB2BGR)
+        return image
 
     @staticmethod
     def draw_point(image, point, radius):
