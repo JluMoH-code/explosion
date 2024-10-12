@@ -166,13 +166,10 @@ class MainWindow(QMainWindow):
                 
                 template = DisplayUtils.open_template_input_window(self.image)
                 if template is not False:
-                    # self.display_image(template)
                     self.ref_points_manager.set_selector(TemplateMatchingSelector())
                     template_points = self.ref_points_manager.select_points(self.image_cv, template, self.scale_factor)
-                    print(template_points)
                     if template_points is not None:
                         self.points += template_points
-                        print(self.points)
                         self.draw_points()       
                 
     def mouse_click(self, event):
