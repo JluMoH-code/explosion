@@ -234,7 +234,8 @@ class MainWindow(QMainWindow):
         Обработка клика на изображении для выбора искомой точки.
         Открывает окно для с локальными и глобальными координатами.
         """
-        
+        self.end_select_points()
+
         if self.image is None:
             return
         
