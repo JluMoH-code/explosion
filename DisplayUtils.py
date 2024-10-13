@@ -87,7 +87,7 @@ class DisplayUtils:
         window = CoordInputWindow(point, update)
         window.exec_()
         
-        return window.get_point() if window.get_point() is not None else False
+        return window.get_point()
     
     @staticmethod
     def open_template_input_window(image):

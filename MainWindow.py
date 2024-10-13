@@ -227,6 +227,7 @@ class MainWindow(QMainWindow):
         """
         Логика для выбора искомой точки.
         """
+        self.end_select_points()
         self.image_label.mousePressEvent = self.mouse_click_target_point
             
     def mouse_click_target_point(self, event):
@@ -234,24 +235,16 @@ class MainWindow(QMainWindow):
         Обработка клика на изображении для выбора искомой точки.
         Открывает окно для с локальными и глобальными координатами.
         """
-        self.end_select_points()
-
         if self.image is None:
             return
         
-        x_scaled = event.pos().x()
-        y_scaled = event.pos().y()
-
-        # Пересчитываем координаты обратно на оригинальные
-        x_original = int(x_scaled / self.scale_factor)
-        y_original = int(y_scaled / self.scale_factor)
-        
-        target_point = Point(local_coords=(x_original, y_original)) 
+        local_coords = self.get_coord_clicked(event.pos)
+        target_point = Point(local_coords=local_coords) 
         
         try:     
-            target_point = CoordinateConverter.convert_to_global(self.points, target_point)  
+            self.target_point = CoordinateConverter.convert_to_global(self.points, target_point)  
             # Открываем окно для отображение координат
-            point = DisplayUtils.open_coords_input_window(target_point)
+            DisplayUtils.open_coords_input_window(target_point)
         except ValueError as e:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Critical)
@@ -264,9 +257,9 @@ class MainWindow(QMainWindow):
             msg.exec_() 
             if msg.clickedButton() == high_precision_btn:
                 try:
-                    target_point = CoordinateConverter.simple_linear_transformation(self.points, target_point)  
+                    self.target_point = CoordinateConverter.simple_linear_transformation(self.points, target_point)  
                     # Открываем окно для отображение координат
-                    point = DisplayUtils.open_coords_input_window(target_point)
+                    DisplayUtils.open_coords_input_window(target_point)
                 except ValueError as e:
                     msg = QMessageBox()
                     msg.setIcon(QMessageBox.Critical)
@@ -276,6 +269,16 @@ class MainWindow(QMainWindow):
             elif msg.clickedButton() == adding_points_btn:
                 self.select_points()
             
+    def get_coord_clicked(self, pos):
+        x_scaled = pos().x()
+        y_scaled = pos().y()
+
+        # Пересчитываем координаты обратно на оригинальные
+        x_original = int(x_scaled / self.scale_factor)
+        y_original = int(y_scaled / self.scale_factor)
+
+        return (x_original, y_original)
+
     @staticmethod
     def run():
         """

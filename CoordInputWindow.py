@@ -62,6 +62,7 @@ class CoordInputWindow(QDialog):
             self.delete_point_btn.clicked.connect(self.reject_with_delete)
             layout.addWidget(self.add_point_btn)
             layout.addWidget(self.delete_point_btn)
+            self.reject = self.reject_with_delete
             
         self.setLayout(layout)
 
@@ -117,4 +118,6 @@ class CoordInputWindow(QDialog):
         """
         Возвращает глобальные и локальные координаты после подтверждения.
         """
+        if self.point is None:
+            return False
         return self.point
