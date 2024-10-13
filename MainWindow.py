@@ -12,11 +12,13 @@ from Point import Point
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.SELECTION_RADIUS = 10
+        self.DOT_RADIUS = 5
+
         self.points = []
         self.image_cv = None
         self.image = None
         self.scale_factor = 1
-        self.selection_radius = 10
         self.ref_points_manager = ReferencePointsManager()
         self.converter = CoordinateConverter()
         self.target_point = None
@@ -100,6 +102,8 @@ class MainWindow(QMainWindow):
         """
         Загрузка изображения через QFileDialog.
         """
+        self.points = []
+
         try:
             file_name = DisplayUtils.open_image_file()
             if file_name:
@@ -117,7 +121,7 @@ class MainWindow(QMainWindow):
             return
         
         display_image = self.image_cv.copy()
-        radius = int(5 / self.scale_factor)
+        radius = int(self.DOT_RADIUS / self.scale_factor)
 
         for point in self.points:
             display_image = DisplayUtils.draw_point(display_image, point, radius)
@@ -215,7 +219,7 @@ class MainWindow(QMainWindow):
         for point in self.points:
             px, py = point.local_coords
             # Проверка расстояния
-            if ((px - x) ** 2 + (py - y) ** 2) <= ((self.selection_radius / self.scale_factor) ** 2):
+            if ((px - x) ** 2 + (py - y) ** 2) <= ((self.SELECTION_RADIUS / self.scale_factor) ** 2):
                 return point
         return None
                 
