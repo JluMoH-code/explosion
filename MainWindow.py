@@ -14,6 +14,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.SELECTION_RADIUS = 10
         self.DOT_RADIUS = 5
+        self.IS_ANALYTICS = True
 
         self.points = []
         self.image_cv = None
@@ -69,6 +70,12 @@ class MainWindow(QMainWindow):
         self.select_target_point_btn = QPushButton("Выбрать искомую точку", self)
         self.select_target_point_btn.clicked.connect(self.select_target_point)
         self.right_layout.addWidget(self.select_target_point_btn, alignment=Qt.AlignCenter)
+
+        if self.IS_ANALYTICS:
+            # Кнопка для получения и сохранения подробной информации
+            self.analytics_btn = QPushButton("Подробная информация", self)
+            self.analytics_btn.clicked.connect(self.analytics_select_target_point)
+            self.right_layout.addWidget(self.analytics_btn, alignment=Qt.AlignCenter)
         
         self.right_layout.addStretch()
 
@@ -278,6 +285,30 @@ class MainWindow(QMainWindow):
         y_original = int(y_scaled / self.scale_factor)
 
         return (x_original, y_original)
+
+    def analytics_select_target_point(self):
+        self.end_select_points()
+        self.image_label.mousePressEvent = self.mouse_click_analytics_target_point
+
+    def mouse_click_analytics_target_point(self, event):
+        """
+        Обработка клика на изображении для выбора искомой точки.
+        Открывает окно для с аналитикой.
+        """
+        if self.image is None:
+            return
+        
+        local_coords = self.get_coord_clicked(event.pos)
+        target_point = Point(local_coords=local_coords) 
+        
+        try:     
+            self.target_point = CoordinateConverter.convert_to_global(self.points, target_point)  
+            DisplayUtils.open_analytics_window(self.points, target_point)
+        except ValueError as e:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText(str(e))
+            msg.setWindowTitle("Ошибка")
 
     @staticmethod
     def run():

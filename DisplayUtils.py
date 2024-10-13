@@ -90,6 +90,16 @@ class DisplayUtils:
         return window.get_point()
     
     @staticmethod
+    def open_analytics_window(ref_points, target_point):
+        """
+        Открыть новое окно для отображения аналитических данных.
+        """
+        from AnalyticsWindow import AnalyticsWindow
+        
+        window = AnalyticsWindow(ref_points, target_point)
+        window.exec_()
+    
+    @staticmethod
     def open_template_input_window(image):
         """
         Открыть новое окно для выбора шаблона.
