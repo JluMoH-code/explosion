@@ -39,8 +39,9 @@ class CoordInputWindow(QDialog):
         layout.addWidget(self.coord_y_input)
         
         if update:
-            self.coord_x_input.setText(str(self.point.global_coords[0]))
-            self.coord_y_input.setText(str(self.point.global_coords[1]))
+            if self.point.global_coords is not None:
+                self.coord_x_input.setText(str(self.point.global_coords[0]))
+                self.coord_y_input.setText(str(self.point.global_coords[1]))
             self.update_point_btn = QPushButton("Обновить точку", self)
             self.delete_point_btn = QPushButton("Удалить точку", self)
             self.update_point_btn.clicked.connect(self.accept_coords)
