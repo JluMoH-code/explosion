@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 import cv2
 from DisplayUtils import DisplayUtils
 from ReferencePointsManager import ReferencePointsManager
-from ReferencePointsSelector import AutoPointsSelector, TemplateMatchingSelector, Selector
+from ReferencePointsSelector import Selector
 from CoordinateConverter import CoordinateConverter
 from Point import Point
 
