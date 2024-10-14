@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
+from enum import Enum
 from Point import Point
 from DisplayUtils import DisplayUtils
-        
+
 class ReferencePointsSelector:
     def __init__(self):
         self.points = []
@@ -76,3 +77,8 @@ class TemplateMatchingSelector(ReferencePointsSelector):
             print(f"Автоматически (по шаблону) добавлена точка: {point}")
 
         return self.points
+    
+class Selector(Enum):
+    Manual = ManualPointsSelector()
+    Auto = AutoPointsSelector()
+    Template = TemplateMatchingSelector()

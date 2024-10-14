@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 import cv2
 from DisplayUtils import DisplayUtils
 from ReferencePointsManager import ReferencePointsManager
-from ReferencePointsSelector import AutoPointsSelector, TemplateMatchingSelector
+from ReferencePointsSelector import AutoPointsSelector, TemplateMatchingSelector, Selector
 from CoordinateConverter import CoordinateConverter
 from Point import Point
 
@@ -54,7 +54,7 @@ class MainWindow(QMainWindow):
 
         # Выпадающий список для выбора метода
         self.method_selector = QComboBox(self)
-        self.method_selector.addItems(["Manual", "Template Matching"])
+        self.method_selector.addItems([s.name for s in Selector])
         self.right_layout.addWidget(self.method_selector, alignment=Qt.AlignCenter)
 
         # Кнопка для выбора точки
@@ -162,7 +162,7 @@ class MainWindow(QMainWindow):
         method = self.method_selector.currentText()
         
         if self.image is not None:
-            if method == "Manual":
+            if method == Selector.Manual.name:
                 self.image_label.mousePressEvent = self.mouse_click
                 
                 # Создаём кнопку "Завершить выбор точек" (если она еще не была создана)
@@ -170,14 +170,14 @@ class MainWindow(QMainWindow):
                     self.finish_select_btn = QPushButton("Завершить выбор точек", self)
                     self.finish_select_btn.clicked.connect(self.end_select_points)
                     self.right_layout.addWidget(self.finish_select_btn, alignment=Qt.AlignCenter)              
-            elif method == "Auto":
-                self.ref_points_manager.set_selector(AutoPointsSelector)
+            elif method == Selector.Auto.name:
+                self.ref_points_manager.set_selector(Selector.Auto.value)
                 self.ref_points_manager.select_point(self.image)
-            elif method == "Template Matching":
+            elif method == Selector.Template.name:
                 
                 template = DisplayUtils.open_template_input_window(self.image)
                 if template is not False:
-                    self.ref_points_manager.set_selector(TemplateMatchingSelector())
+                    self.ref_points_manager.set_selector(Selector.Template.value)
                     template_points = self.ref_points_manager.select_points(self.image_cv, template, self.scale_factor)
                     if template_points is not None:
                         self.points += template_points
