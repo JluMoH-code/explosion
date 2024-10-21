@@ -1,13 +1,14 @@
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel, QPushButton, 
                              QComboBox, QVBoxLayout, QHBoxLayout, QWidget, 
                              QMessageBox)
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QPoint
 import cv2
 from DisplayUtils import DisplayUtils
 from ReferencePointsManager import ReferencePointsManager
 from ReferencePointsSelector import Selector
 from CoordinateConverter import CoordinateConverter
 from Point import Point
+from ZoomingLabel import ZoomingLabel
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -23,6 +24,7 @@ class MainWindow(QMainWindow):
         self.ref_points_manager = ReferencePointsManager()
         self.converter = CoordinateConverter()
         self.target_point = None
+        self.is_selecting_point = False
         
         self.setWindowTitle("Выбор реперных точек")
 
@@ -34,9 +36,10 @@ class MainWindow(QMainWindow):
         self.main_layout = QHBoxLayout(central_widget)
 
         # Левая часть - отображение изображения
-        self.image_label = QLabel(self)
+        self.image_label = ZoomingLabel(self)
         self.image_label.setText("Выберите изображение или видео")
         self.image_label.setAlignment(Qt.AlignCenter)
+        self.image_label.clicked_point[QPoint].connect(self.clicked_point)
 
         # Правая часть - элементы управления
         self.right_layout = QVBoxLayout()
@@ -143,12 +146,13 @@ class MainWindow(QMainWindow):
         """
         scaled_pixmap, self.scale_factor = DisplayUtils.get_scaled_pixmap(image, max_width=1280, max_height=720)
         self.image_label.setPixmap(scaled_pixmap)
+        self.image_label.update()
 
     def end_select_points(self):
         """
         Логика для завершения выбора точек.
         """
-        self.image_label.mousePressEvent = None
+        self.is_selecting_point = False
         
         if hasattr(self, 'finish_select_btn'):
             self.right_layout.removeWidget(self.finish_select_btn)
@@ -163,11 +167,11 @@ class MainWindow(QMainWindow):
         
         if self.image is not None:
             if method == Selector.Manual.name:
-                self.image_label.mousePressEvent = self.mouse_click
-                
+                self.is_selecting_point = True
+
                 # Создаём кнопку "Завершить выбор точек" (если она еще не была создана)
                 if not hasattr(self, 'finish_select_btn'):
-                    self.finish_select_btn = QPushButton("Завершить выбор точек", self)
+                    self.finish_select_btn = QPushButton("Завершить выбор точки", self)
                     self.finish_select_btn.clicked.connect(self.end_select_points)
                     self.right_layout.addWidget(self.finish_select_btn, alignment=Qt.AlignCenter)              
             elif method == Selector.Auto.name:
@@ -183,41 +187,42 @@ class MainWindow(QMainWindow):
                         self.points += template_points
                         self.draw_points()       
                 
-    def mouse_click(self, event):
+    def clicked_point(self, pos):
         """
         Обработка клика на изображении для выбора точки.
         Открывает окно для ввода глобальных координат и отображает точку.
         """
-        x_scaled = event.pos().x()
-        y_scaled = event.pos().y()
+        if self.is_selecting_point:
 
-        # Пересчитываем координаты обратно на оригинальные
-        x_original = int(x_scaled / self.scale_factor)
-        y_original = int(y_scaled / self.scale_factor)
-        
-        # Проверка, находится ли клик в пределах существующих точек
-        nearest_point = self.find_nearest_point(x_original, y_original)
-        if nearest_point:
-            updated_point = DisplayUtils.open_coords_input_window(nearest_point, update=True)
-            if updated_point:
-                index = self.points.index(nearest_point)
-                self.points[index] = updated_point
-                self.draw_points()
-                self.update_points_count()
-            else:
-                self.points.remove(nearest_point)  
+            x_original = int(pos.x() / self.scale_factor)
+            y_original = int(pos.y() / self.scale_factor)
+
+            # Проверка, находится ли клик в пределах существующих точек
+            nearest_point = self.find_nearest_point(x_original, y_original)
+
+            if nearest_point:
+                updated_point = DisplayUtils.open_coords_input_window(nearest_point, update=True)
+                if updated_point:
+                    index = self.points.index(nearest_point)
+                    self.points[index] = updated_point
+                else:
+                    self.points.remove(nearest_point)  
+                    
                 self.draw_points() 
                 self.update_points_count()
-            return
+                self.end_select_points()
+                return
 
-        # Открываем окно для ввода глобальных координат (локальные координаты передаются)
-        point = Point(local_coords=(x_original, y_original))
-        point = DisplayUtils.open_coords_input_window(point)
-        
-        if point:
-            self.points.append(point)
-            self.draw_points()
-            self.update_points_count()
+            # Открываем окно для ввода глобальных координат (локальные координаты передаются)
+            point = Point(local_coords=(x_original, y_original))
+            point = DisplayUtils.open_coords_input_window(point)
+            
+            if point:
+                self.points.append(point)
+                self.draw_points()
+                self.update_points_count()
+
+            self.end_select_points()
          
     def find_nearest_point(self, x, y):
         """
