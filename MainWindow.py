@@ -39,7 +39,6 @@ class MainWindow(QMainWindow):
         self.image_label = ZoomingLabel(self)
         self.image_label.setText("Выберите изображение или видео")
         self.image_label.setAlignment(Qt.AlignCenter)
-        self.image_label.clicked_point[QPoint].connect(self.clicked_point)
 
         # Правая часть - элементы управления
         self.right_layout = QVBoxLayout()
@@ -168,6 +167,7 @@ class MainWindow(QMainWindow):
         if self.image is not None:
             if method == Selector.Manual.name:
                 self.is_selecting_point = True
+                self.image_label.clicked_point[QPoint].connect(self.clicked_point)
 
                 # Создаём кнопку "Завершить выбор точек" (если она еще не была создана)
                 if not hasattr(self, 'finish_select_btn'):
@@ -192,37 +192,37 @@ class MainWindow(QMainWindow):
         Обработка клика на изображении для выбора точки.
         Открывает окно для ввода глобальных координат и отображает точку.
         """
-        if self.is_selecting_point:
+        self.image_label.clicked_point.disconnect(self.clicked_point)
 
-            x_original = int(pos.x() / self.scale_factor)
-            y_original = int(pos.y() / self.scale_factor)
+        x_original = int(pos.x() / self.scale_factor)
+        y_original = int(pos.y() / self.scale_factor)
 
-            # Проверка, находится ли клик в пределах существующих точек
-            nearest_point = self.find_nearest_point(x_original, y_original)
+        # Проверка, находится ли клик в пределах существующих точек
+        nearest_point = self.find_nearest_point(x_original, y_original)
 
-            if nearest_point:
-                updated_point = DisplayUtils.open_coords_input_window(nearest_point, update=True)
-                if updated_point:
-                    index = self.points.index(nearest_point)
-                    self.points[index] = updated_point
-                else:
-                    self.points.remove(nearest_point)  
-                    
-                self.draw_points() 
-                self.update_points_count()
-                self.end_select_points()
-                return
-
-            # Открываем окно для ввода глобальных координат (локальные координаты передаются)
-            point = Point(local_coords=(x_original, y_original))
-            point = DisplayUtils.open_coords_input_window(point)
-            
-            if point:
-                self.points.append(point)
-                self.draw_points()
-                self.update_points_count()
-
+        if nearest_point:
+            updated_point = DisplayUtils.open_coords_input_window(nearest_point, update=True)
+            if updated_point:
+                index = self.points.index(nearest_point)
+                self.points[index] = updated_point
+            else:
+                self.points.remove(nearest_point)  
+                
+            self.draw_points() 
+            self.update_points_count()
             self.end_select_points()
+            return
+
+        # Открываем окно для ввода глобальных координат (локальные координаты передаются)
+        point = Point(local_coords=(x_original, y_original))
+        point = DisplayUtils.open_coords_input_window(point)
+        
+        if point:
+            self.points.append(point)
+            self.draw_points()
+            self.update_points_count()
+
+        self.end_select_points()
          
     def find_nearest_point(self, x, y):
         """
@@ -240,9 +240,9 @@ class MainWindow(QMainWindow):
         Логика для выбора искомой точки.
         """
         self.end_select_points()
-        self.image_label.mousePressEvent = self.mouse_click_target_point
+        self.image_label.clicked_point[QPoint].connect(self.mouse_click_target_point)
             
-    def mouse_click_target_point(self, event):
+    def mouse_click_target_point(self, pos):
         """
         Обработка клика на изображении для выбора искомой точки.
         Открывает окно для с локальными и глобальными координатами.
@@ -250,7 +250,9 @@ class MainWindow(QMainWindow):
         if self.image is None:
             return
         
-        local_coords = self.get_coord_clicked(event.pos)
+        self.image_label.clicked_point[QPoint].disconnect(self.mouse_click_target_point)
+
+        local_coords = self.get_coord_clicked(pos)
         target_point = Point(local_coords=local_coords) 
         
         try:     
@@ -282,8 +284,8 @@ class MainWindow(QMainWindow):
                 self.select_points()
             
     def get_coord_clicked(self, pos):
-        x_scaled = pos().x()
-        y_scaled = pos().y()
+        x_scaled = pos.x()
+        y_scaled = pos.y()
 
         # Пересчитываем координаты обратно на оригинальные
         x_original = int(x_scaled / self.scale_factor)
@@ -293,9 +295,9 @@ class MainWindow(QMainWindow):
 
     def analytics_select_target_point(self):
         self.end_select_points()
-        self.image_label.mousePressEvent = self.mouse_click_analytics_target_point
+        self.image_label.clicked_point[QPoint].connect(self.mouse_click_analytics_target_point)
 
-    def mouse_click_analytics_target_point(self, event):
+    def mouse_click_analytics_target_point(self, pos):
         """
         Обработка клика на изображении для выбора искомой точки.
         Открывает окно для с аналитикой.
@@ -303,7 +305,9 @@ class MainWindow(QMainWindow):
         if self.image is None:
             return
         
-        local_coords = self.get_coord_clicked(event.pos)
+        self.image_label.clicked_point[QPoint].disconnect(self.mouse_click_analytics_target_point)
+        
+        local_coords = self.get_coord_clicked(pos)
         target_point = Point(local_coords=local_coords) 
         
         try:     
